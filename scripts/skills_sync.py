@@ -96,6 +96,7 @@ class FileOp:
 
     kind: str
     src: Path | None
+    root: Path
     dst: Path
     reason: str
 
@@ -179,10 +180,10 @@ def plan_sync(
         dst = harness_root / rel
         new_bytes = _maybe_transform(src, transform)
         if dst.exists() and _file_hash(dst) == _bytes_hash(new_bytes):
-            ops.append(FileOp("skip", src, dst, "identical content"))
+            ops.append(FileOp("skip", src, harness_root, dst, "identical content"))
         else:
             reason = "new file" if not dst.exists() else "content differs"
-            ops.append(FileOp("write", src, dst, reason))
+            ops.append(FileOp("write", src, harness_root, dst, reason))
 
     return ops
 
@@ -215,7 +216,7 @@ def plan_uninstall(
             continue
         rel = dst.relative_to(harness_root)
         if rel in known_rel:
-            ops.append(FileOp("remove", None, dst, "known-source file"))
+            ops.append(FileOp("remove", None, harness_root, dst, "known-source file"))
 
     return ops
 
@@ -251,10 +252,10 @@ def apply_ops(ops: list[FileOp], harness: str) -> tuple[int, int]:
             written += 1
         elif op.kind == "remove":
             op.dst.unlink()
-            # Walk up and remove any now-empty parent dirs, but stop at
-            # the harness root (which the user owns).
+            # Walk up and remove any now-empty parent dirs, but never remove
+            # the harness root itself.
             parent = op.dst.parent
-            while parent.is_dir() and not any(parent.iterdir()):
+            while parent != op.root and parent.is_dir() and not any(parent.iterdir()):
                 try:
                     parent.rmdir()
                 except OSError:
