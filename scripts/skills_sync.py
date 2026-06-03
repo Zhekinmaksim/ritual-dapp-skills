@@ -6,10 +6,10 @@ script (and dropped directly into Claude Code, Cursor, and OpenClaw paths).
 This utility makes that one command.
 
 Supported harnesses:
-  - claude-code   <target>/.claude/skills/ritual-dapp-skills/
-  - cursor        <target>/.cursor/rules/ritual-dapp-skills/
-  - openclaw      <target>/.openclaw/skills/ritual-dapp-skills/
-  - hermes        <target>/skills/blockchain/ritual/
+  - claude-code  -> <target>/.claude/skills/ritual-dapp-skills/
+  - cursor       -> <target>/.cursor/rules/ritual-dapp-skills/
+  - openclaw     -> <target>/.openclaw/skills/ritual-dapp-skills/
+  - hermes       -> <target>/skills/blockchain/ritual/
 
 Default target is the user's home directory. Override with --target.
 
