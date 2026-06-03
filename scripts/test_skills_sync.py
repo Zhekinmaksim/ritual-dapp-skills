@@ -165,6 +165,18 @@ class TestSkillsSync(unittest.TestCase):
             ).exists()
         )
 
+    def test_uninstall_preserves_harness_root_directory(self) -> None:
+        ss.apply_ops(
+            ss.plan_sync(self.repo, self.target, "hermes", []), "hermes"
+        )
+        harness_root = self.target / "skills" / "blockchain" / "ritual"
+
+        ops = ss.plan_uninstall(self.repo, self.target, "hermes")
+        ss.apply_ops(ops, "hermes")
+
+        self.assertTrue(harness_root.is_dir())
+        self.assertEqual(list(harness_root.iterdir()), [])
+
     def test_uninstall_on_missing_target_noop(self) -> None:
         ops = ss.plan_uninstall(self.repo, self.tmp / "nonexistent", "hermes")
         self.assertEqual(ops, [])
